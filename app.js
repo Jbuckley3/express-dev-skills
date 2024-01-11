@@ -1,12 +1,10 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 const skillsRouter = require('./routes/skills');
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const methodOverride = require('method-override');
 
 var app = express();
 
@@ -20,23 +18,28 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
 // Use skills route
 app.use('/skills', skillsRouter);
 
-// catch 404 and forward to error handler
+app.use(methodOverride('_method'));
+
+// Define a route handler for the root path
+app.get('/', function(req, res) {
+  res.render('index', { title: 'Express' });
+});
+
+// Catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
 
-// error handler
+// Error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
+  // Set locals, providing error only in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
+  // Render the error page
   res.status(err.status || 500);
   res.render('error');
 });
